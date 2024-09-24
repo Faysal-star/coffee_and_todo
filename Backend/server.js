@@ -8,10 +8,8 @@ const port = 3001;
 app.use(cors());
 app.use(express.json());
 
-// Connect to SQLite database
 const db = new Database("./studytracker.db", { verbose: console.log });
 
-// Create table if it doesn't exist
 db.exec(`CREATE TABLE IF NOT EXISTS entries (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   date TEXT,
@@ -20,7 +18,6 @@ db.exec(`CREATE TABLE IF NOT EXISTS entries (
 )`);
 
 // db.exec(`DROP TABLE todos`);
-// Create todo table - id - text - status
 db.exec(`CREATE TABLE IF NOT EXISTS todos (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     text TEXT,
@@ -28,7 +25,6 @@ db.exec(`CREATE TABLE IF NOT EXISTS todos (
 )`);
 
 
-// Prepare statements
 const insertEntry = db.prepare(
   "INSERT INTO entries (date, topic, hours) VALUES (?, ?, ?)"
 );
@@ -44,6 +40,7 @@ const insertTodo = db.prepare(
 const updateTodo = db.prepare("UPDATE todos SET completed = ? WHERE id = ?");
 const deleteTodo = db.prepare("DELETE FROM todos WHERE id = ?");
 
+// Study Tracker Routes
 app.post("/api/entries", (req, res) => {
   const { date, topic, hours } = req.body;
   try {
@@ -71,17 +68,13 @@ app.put("/api/entries/:id", (req, res) => {
   const { hours } = req.body;
 
   try {
-    // Check if the entry exists
     const entry = getEntryById.get(id);
     if (!entry) {
       return res.status(404).json({ error: "Entry not found" });
     }
-
-    // Update the entry
     const result = updateEntry.run(JSON.stringify(hours), id);
 
     if (result.changes > 0) {
-      // Fetch the updated entry
       const updatedEntry = getEntryById.get(id);
       res.json({
         ...updatedEntry,
@@ -99,13 +92,10 @@ app.delete("/api/entries/:id", (req, res) => {
   const { id } = req.params;
 
   try {
-    // Check if the entry exists
     const entry = getEntryById.get(id);
     if (!entry) {
       return res.status(404).json({ error: "Entry not found" });
     }
-
-    // Delete the entry
     const result = deleteEntry.run(id);
 
     if (result.changes > 0) {
@@ -118,6 +108,8 @@ app.delete("/api/entries/:id", (req, res) => {
   }
 });
 
+
+// Todo Routes
 app.post("/api/todos", (req, res) => {
     const { text, completed } = req.body;
     try {
@@ -148,18 +140,14 @@ app.put("/api/todos/:id", (req, res) => {
     const { completed } = req.body;
     // console.log(id , completed);
     try {
-        // Check if the todo exists
         const todo = getTodoById.get(id);
         const completedT = completed ? "true" : "false";
         if (!todo) {
             return res.status(404).json({ error: "Todo not found" });
         }
-
-        // Update the todo
         const result = updateTodo.run(completedT, id);
 
         if (result.changes > 0) {
-            // Fetch the updated todo
             const updatedTodo = getTodoById.get(id);
             res.json(updatedTodo);
         } else {
@@ -175,13 +163,10 @@ app.delete("/api/todos/:id", (req, res) => {
     const { id } = req.params;
 
     try {
-        // Check if the todo exists
         const todo = getTodoById.get(id);
         if (!todo) {
             return res.status(404).json({ error: "Todo not found" });
         }
-
-        // Delete the todo
         const result = deleteTodo.run(id);
 
         if (result.changes > 0) {
@@ -198,7 +183,7 @@ app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
 
-// Close the database connection when the app is shutting down
+// Close the database connection on process exit
 process.on("exit", () => db.close());
 process.on("SIGHUP", () => process.exit(128 + 1));
 process.on("SIGINT", () => process.exit(128 + 2));

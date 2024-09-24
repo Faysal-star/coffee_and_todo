@@ -13,6 +13,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
 import Todo from "../ToDo/ToDo";
+import coffee from "@/assets/coffee.png";
 
 const API_URL = "http://localhost:3001/api";
 
@@ -179,7 +180,7 @@ const StudyTracker: React.FC = () => {
 
   return (
     <div className="p-4 w-[95vw] m-auto">
-      <h1 className="text-2xl font-bold mb-4">Study Tracker</h1>
+      <img src={coffee} alt="" className="h-[60px] mb-4"/>
       <div className="mb-4 flex h-[300px]">
         <Calendar
           mode="single"
