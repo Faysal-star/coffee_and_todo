@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Trash2 } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 import {
   Table,
   TableBody,
@@ -19,6 +20,7 @@ interface Todo {
 }
 
 const API_URL = "http://localhost:3001/api";
+// const API_URL = "http://192.168.0.100:3001/api";
 
 export default function Todo() {
   const [todos, setTodos] = useState<Todo[]>([]);
@@ -122,6 +124,10 @@ export default function Todo() {
           Pending
         </Button>
       </div>
+        <Progress
+            value={(todos.filter((todo) => todo.completed).length / todos.length) * 100}
+            className="mb-4"
+        />
       <div className="flex space-x-2 mb-4">
         <Input
           type="text"

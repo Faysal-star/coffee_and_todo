@@ -16,6 +16,7 @@ import Todo from "../ToDo/ToDo";
 import coffee from "@/assets/coffee.png";
 
 const API_URL = "http://localhost:3001/api";
+// const API_URL = "http://192.168.0.100:3001/api";
 
 interface Entry {
   id: string;
