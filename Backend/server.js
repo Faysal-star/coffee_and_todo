@@ -19,6 +19,15 @@ db.exec(`CREATE TABLE IF NOT EXISTS entries (
   hours TEXT
 )`);
 
+// db.exec(`DROP TABLE todos`);
+// Create todo table - id - text - status
+db.exec(`CREATE TABLE IF NOT EXISTS todos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    text TEXT,
+    completed TEXT
+)`);
+
+
 // Prepare statements
 const insertEntry = db.prepare(
   "INSERT INTO entries (date, topic, hours) VALUES (?, ?, ?)"
@@ -27,6 +36,13 @@ const getAllEntries = db.prepare("SELECT * FROM entries");
 const updateEntry = db.prepare("UPDATE entries SET hours = ? WHERE id = ?");
 const getEntryById = db.prepare("SELECT * FROM entries WHERE id = ?");
 const deleteEntry = db.prepare("DELETE FROM entries WHERE id = ?");
+const getTodoById = db.prepare("SELECT * FROM todos WHERE id = ?");
+const getAllTodos = db.prepare("SELECT * FROM todos");
+const insertTodo = db.prepare(
+  "INSERT INTO todos (text, completed) VALUES (?, ?)"
+);
+const updateTodo = db.prepare("UPDATE todos SET completed = ? WHERE id = ?");
+const deleteTodo = db.prepare("DELETE FROM todos WHERE id = ?");
 
 app.post("/api/entries", (req, res) => {
   const { date, topic, hours } = req.body;
@@ -100,6 +116,82 @@ app.delete("/api/entries/:id", (req, res) => {
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
+});
+
+app.post("/api/todos", (req, res) => {
+    const { text, completed } = req.body;
+    try {
+        const completedT = completed ? "true" : "false";
+        console.log(text, completed);
+        const result = insertTodo.run(text, completedT);
+        res.json({ id: result.lastInsertRowid });
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+    }
+);
+
+app.get("/api/todos", (req, res) => {
+    try {
+        const todos = getAllTodos.all();
+        todos.forEach((todo) => {
+            todo.completed = todo.completed === "true";
+        });
+        res.json(todos);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+app.put("/api/todos/:id", (req, res) => {
+    const { id } = req.params;
+    const { completed } = req.body;
+    // console.log(id , completed);
+    try {
+        // Check if the todo exists
+        const todo = getTodoById.get(id);
+        const completedT = completed ? "true" : "false";
+        if (!todo) {
+            return res.status(404).json({ error: "Todo not found" });
+        }
+
+        // Update the todo
+        const result = updateTodo.run(completedT, id);
+
+        if (result.changes > 0) {
+            // Fetch the updated todo
+            const updatedTodo = getTodoById.get(id);
+            res.json(updatedTodo);
+        } else {
+            res.status(400).json({ error: "Failed to update todo" });
+        }
+    } catch (err) {
+        console.log(err);
+        res.status(400).json({ error: err.message });
+    }
+});
+
+app.delete("/api/todos/:id", (req, res) => {
+    const { id } = req.params;
+
+    try {
+        // Check if the todo exists
+        const todo = getTodoById.get(id);
+        if (!todo) {
+            return res.status(404).json({ error: "Todo not found" });
+        }
+
+        // Delete the todo
+        const result = deleteTodo.run(id);
+
+        if (result.changes > 0) {
+            res.json({ id: parseInt(id) });
+        } else {
+            res.status(400).json({ error: "Failed to delete todo" });
+        }
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
 });
 
 app.listen(port, () => {

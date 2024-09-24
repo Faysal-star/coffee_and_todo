@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
+import Todo from "../ToDo/ToDo";
 
 const API_URL = "http://localhost:3001/api";
 
@@ -177,7 +178,7 @@ const StudyTracker: React.FC = () => {
   }
 
   return (
-    <div className="p-4 w-[90vw] m-auto">
+    <div className="p-4 w-[95vw] m-auto">
       <h1 className="text-2xl font-bold mb-4">Study Tracker</h1>
       <div className="mb-4 flex h-[300px]">
         <Calendar
@@ -188,7 +189,7 @@ const StudyTracker: React.FC = () => {
           }
           className="rounded-md border  border-slate-300"
         />
-        <div className="w-[30%] h-[100%] flex">
+        <div className="w-[20%] h-[100%] flex">
           <div className="w-full flex flex-col ml-4">
             <div className="flex mb-4">
               <Input
@@ -223,7 +224,7 @@ const StudyTracker: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="ml-4 flex-grow p-2 border rounded-md border-slate-300 overflow-y-scroll">
+        <div className="ml-4 w-[30%] p-2 border rounded-md border-slate-300 overflow-y-scroll">
           <Table className="">
             <TableHeader>
               <TableRow>
@@ -245,17 +246,18 @@ const StudyTracker: React.FC = () => {
             </TableBody>
           </Table>
         </div>
+        <Todo/>
       </div>
 
       <Table>
         <TableHeader>
           <TableRow>
             <TableHead className="w-[110px]">Date</TableHead>
-            <TableHead className="w-[170px]">Topic</TableHead>
+            <TableHead className="w-[200px]">Topic</TableHead>
             {Array.from({ length: 13 }, (_, i) => (
               <TableHead key={i}>{i.toString().padStart(2, "0")}</TableHead>
             ))}
-            <TableHead>Total</TableHead>
+            <TableHead className="w-[100px]">Total</TableHead>
             <TableHead className="w-[100px]">Action</TableHead>
           </TableRow>
         </TableHeader>
